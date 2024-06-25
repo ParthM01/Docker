@@ -1,23 +1,31 @@
 version: '3'
 services:
-  web:
-    image: flask_app:latest
-    build: .
+  
+  backend:
+    build:
+      context: .
     ports:
       - "5000:5000"
     environment:
-      - DATABASE_HOST=db
-      - DATABASE_USER=root
-      - DATABASE_PASSWORD=example
+      MYSQL_HOST: mysql
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DB: myDb
     depends_on:
-      - db
-  db:
+      - mysql
+
+  mysql:
     image: mysql:5.7
-    restart: always
+    ports:
+      - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: myDb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
     volumes:
-      - db_data:/var/lib/mysql
+      - ./message.sql:/docker-entrypoint-initdb.d/message.sql   # Mount sql script into container's /docker-entrypoint-initdb.d directory to get table automatically created
+      - mysql-data:/var/lib/mysql  # Mount the volume for MySQL data storage
 
 volumes:
-  db_data:
+  mysql-data:
